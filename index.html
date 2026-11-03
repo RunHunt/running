@@ -506,16 +506,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
       <p class="note" id="st-note"></p>
     </div>
 
-    <div class="field">
-      <div class="top"><span class="badge b-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span class="lab">실제 장소에 배치</span><span class="hint">지도 데이터 사용</span></div>
-      <div class="seg" role="group" aria-label="실제 장소에 배치">
-        <button id="st-poi-on" aria-pressed="true">켜기</button>
-        <button id="st-poi-off" aria-pressed="false">끄기</button>
-      </div>
-      <p class="note">오픈스트리트맵에서 근처의 가게·공원·역·건물 같은 <b>실제로 갈 수 있는 장소</b>를 찾아 그곳에 몬스터를 둬요. 지도를 못 받으면 임의 위치를 써요.</p>
-    </div>
-
-    <p class="note" id="st-area" style="margin-top:12px" hidden>러닝 영역은 일반 모드에서 정해 둔 설정을 따라요.</p>
+<p class="note" id="st-area" style="margin-top:12px" hidden>러닝 영역은 일반 모드에서 정해 둔 설정을 따라요.</p>
     <p class="note" id="st-msg" style="margin-top:10px;color:var(--gold)" hidden></p>
     <button class="cta" id="st-start">원정 시작</button>
   </section>
@@ -586,16 +577,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
       <p class="note" id="dest-note" hidden>도착지를 정하면 도착했을 때 원정이 끝나고 보스 몬스터가 기다려요. 위의 목표(거리, 시간, 자유)는 쓰이지 않아요.</p>
     </div>
 
-    <div class="field">
-      <div class="top"><span class="badge b-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span class="lab">실제 장소에 배치</span><span class="hint">지도 데이터 사용</span></div>
-      <div class="seg" role="group" aria-label="실제 장소에 배치">
-        <button id="poi-on" aria-pressed="true">켜기</button>
-        <button id="poi-off" aria-pressed="false">끄기</button>
-      </div>
-      <p class="note">오픈스트리트맵에서 근처의 가게·공원·역·건물 같은 <b>실제로 갈 수 있는 장소</b>를 찾아 그곳에 몬스터를 둬요. 지도를 못 받으면 임의 위치를 써요.</p>
-    </div>
-
-    <div class="field" id="area-field">
+<div class="field" id="area-field">
       <div class="top"><span class="badge b-lav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="3.2 3.2"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg></span><span class="lab">러닝 영역</span><span class="hint" id="area-hint"></span></div>
       <div class="seg" role="group" aria-label="러닝 영역">
         <button id="a-off" aria-pressed="true">제한 없음</button>
@@ -821,8 +803,7 @@ if(cfg.dest&&cfg.dest.loop)cfg.dest=null;
 if(!cfg.destMode)cfg.destMode='none';
 if(!cfg.loopKm)cfg.loopKm=3;
 cfg.stage=Object.assign({base:360,step:15,n:5,per:3},cfg.stage||{});
-if(cfg.poi===undefined)cfg.poi=true;
-function poiOn(){return cfg.poi!==false}
+function poiOn(){return true} /* 걸어서 갈 수 있는 길 위 소환은 항상 켜짐 */
 function stOn(){return !!(R&&R.st)}
 function destOn(){return !stOn()&&(cfg.destMode==='place'||cfg.destMode==='loop')}
 function isFree(){return !stOn()&&cfg.goalType==='free'&&!destOn()}
@@ -1209,7 +1190,6 @@ function paintSetup(){
     txt=isFree()?'<b>자유 달리기</b>예요. 몬스터는 계속 나타나요!<span class="sub">종료 버튼을 누를 때까지 이어져요</span>':'몬스터 약 <b>'+n+'마리</b>가 기다리고 있어요!<span class="sub">한 마리까지 평균 약 '+Math.round(d/10)*10+'m, 달려서 약 2분 30초</span>';
   }
   $('#forecast').innerHTML=txt;
-  $('#poi-on').setAttribute('aria-pressed',String(poiOn()));$('#poi-off').setAttribute('aria-pressed',String(!poiOn()));
   $('#start-msg').hidden=true;
 }
 function canStart(){
@@ -1627,8 +1607,9 @@ function onPos(p){
       if(R.poiWait){render();return}
       if(!R.poiTried){
         R.poiTried=true;R.poiWait=true;var mineR=R,fired=false;
-        var go=function(){if(fired||R!==mineR)return;fired=true;R.poiWait=false;if(R.phase==='locating'&&R.last){spawn();render()}};
-        setTimeout(go,6500);
+        var go=function(){if(fired||R!==mineR)return;fired=true;R.poiWait=false;setNotice('');if(R.phase==='locating'&&R.last){spawn();render()}};
+        setNotice('근처에서 걸어갈 수 있는 길을 찾는 중이에요…');
+        setTimeout(go,12000);
         poiLoad(poiCenter(),poiRadius(),go);render();return;
       }
     }
@@ -1678,7 +1659,12 @@ function spawn(){
   if(R.area&&!boss)d=Math.min(d,Math.max(60,R.area.r*0.9));
   if(brg==null)brg=R.heading!=null?R.heading+(Math.random()-0.5)*120:Math.random()*360;
   var pt=fixed?{lat:fixed.lat,lng:fixed.lng}:null,place='';
-  if(!pt){var pq=poiPick(R.pos,d,brg);if(pq){pt={lat:pq.lat,lng:pq.lng};place=pq.name;R.recent=(R.recent||[]).concat([pq]).slice(-5)}}
+  var wd=null;
+  if(!pt){
+    var pq=poiPick(R.pos,d,brg)||poiPick(R.pos,d,brg,null,true);
+    if(pq){pt={lat:pq.lat,lng:pq.lng};place=pq.name;wd=pq.nd;R.recent=(R.recent||[]).concat([pq]).slice(-5)}
+    else if(!POI.g&&!R.walkWarn){R.walkWarn=1;setNotice('지도를 불러오지 못해 임의 위치에 소환했어요. 인터넷 연결을 확인해 주세요.');setTimeout(function(){setNotice('')},7000)}
+  }
   if(!pt){
     if(R.area){
       for(var k=0;k<18&&!pt;k++){
@@ -1689,7 +1675,7 @@ function spawn(){
       if(!pt){var dc=hav(R.pos,R.area.c);d=Math.max(40,Math.min(d,dc));pt=dest(R.pos,d,bearing(R.pos,R.area.c))}
     }else pt=dest(R.pos,d,brg);
   }
-  if(!boss)d=Math.max(30,hav(R.pos,pt));
+  if(!boss)d=Math.max(30,wd!=null?wd:hav(R.pos,pt));
   var sec=d/1000*paceNow();
   var idx=boss?bossIdx():pickMonster(sec);
   R.monster={lat:pt.lat,lng:pt.lng,d0:d,target:sec*1000,elapsed:0,idx:idx,boss:boss,place:place};
@@ -1699,64 +1685,119 @@ function spawn(){
   if(R.st&&!R.st.shown){R.st.shown=true;banner('STAGE 1','목표 페이스 '+fmtPace(stagePace(R.st,1))+'/km',2600)}
 }
 /* ---------- 스테이지 모드 ---------- */
-/* ---------- 실제 장소(OpenStreetMap) ---------- */
-var POI={list:[],c:null,t:0,busy:false,cbs:[]};
+/* ---------- 걸어서 갈 수 있는 위치(OpenStreetMap 보행 경로) ---------- */
+/* 위치를 받으면 주변의 걸을 수 있는 길(인도·보행로·골목·생활도로)을 불러와 길 위의 점만 몬스터 자리로 쓴다.
+   내 위치에서 길을 따라 실제로 걸어 닿을 수 있는 점(연결망 탐색)만 고르므로 건물 안·강·철로·고속도로 너머에는 나타나지 않는다. */
+var POI={g:null,c:null,t:0,busy:false,cbs:[],failT:0};
 var OVP=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+var WALK_HW='footway|path|pedestrian|steps|cycleway|track|living_street|residential|service|unclassified|road|tertiary|tertiary_link|secondary|secondary_link|primary|primary_link';
+var HW_OK={};WALK_HW.split('|').forEach(function(x){HW_OK[x]=1});
+var HW_PED={footway:1,path:1,pedestrian:1,cycleway:1,track:1,living_street:1};   /* 소환 우선(3) */
+var HW_LOW={residential:1,service:1,unclassified:1,road:1,steps:1};              /* 소환 가능(2) */
+/* 그 밖의 큰 길(1)은 길 연결과 마지막 대안으로만 쓴다 */
 function poiCenter(){return R&&R.area?R.area.c:(R&&R.pos)}
 function poiRadius(){return R&&R.area?clamp(R.area.r+100,300,1500):900}
-function poiParse(j){
-  var out=[],seen={};
+function walkBuild(j){
+  var idx={},la=[],ln=[],adj=[],sp=[],nm=[];
+  function nd(a,b){var k=a.toFixed(6)+','+b.toFixed(6),i=idx[k];if(i===undefined){i=la.length;idx[k]=i;la.push(a);ln.push(b);adj.push([]);sp.push(0);nm.push('')}return i}
   ((j&&j.elements)||[]).forEach(function(e){
-    var t=e.tags||{};if(!t.name)return;
-    if(t.access==='private'||t.access==='no')return;
-    var la=e.lat!=null?e.lat:(e.center&&e.center.lat),ln=e.lon!=null?e.lon:(e.center&&e.center.lon);
-    if(la==null||ln==null)return;
-    var k=t.name+'|'+la.toFixed(3)+'|'+ln.toFixed(3);if(seen[k])return;seen[k]=1;
-    out.push({lat:la,lng:ln,name:t.name});
+    var t=e.tags||{},hw=t.highway,g=e.geometry;
+    if(e.type!=='way'||!hw||!g||g.length<2||!HW_OK[hw])return;
+    var ft=t.foot,ac=t.access,okFoot=ft==='yes'||ft==='designated'||ft==='permissive';
+    if(ft==='no'||ft==='private'||t.area==='yes'||t.indoor==='yes')return;
+    if((ac==='no'||ac==='private')&&!okFoot)return;
+    if(hw==='cycleway'&&!okFoot)return;
+    if(hw==='service'&&t.service==='driveway')return;
+    var ped=!!HW_PED[hw];
+    if(t.tunnel==='yes'&&!ped&&hw!=='steps')return;
+    var lv=ped?3:(HW_LOW[hw]?2:1);
+    if(t.footway==='crossing'||t.cycleway==='crossing'||t.service==='parking_aisle')lv=0;
+    var name=t['name:ko']||t.name||'';
+    function mark(i){if(lv>sp[i])sp[i]=lv;if(name&&!nm[i])nm[i]=name}
+    function link(a,b,w){adj[a].push(b,w);adj[b].push(a,w)}
+    var p=nd(g[0].lat,g[0].lon);mark(p);
+    for(var i=1;i<g.length;i++){
+      var A=g[i-1],B=g[i],L=hav({lat:A.lat,lng:A.lon},{lat:B.lat,lng:B.lon}),n=Math.max(1,Math.ceil(L/25));
+      for(var s=1;s<=n;s++){
+        var f=s/n,x=s===n?nd(B.lat,B.lon):nd(A.lat+(B.lat-A.lat)*f,A.lon+(B.lon-A.lon)*f);
+        mark(x);if(x!==p)link(p,x,L/n);p=x;
+      }
+    }
   });
-  return out.slice(0,400);
+  return la.length>20?{la:la,ln:ln,adj:adj,sp:sp,nm:nm}:null;
 }
 function poiLoad(c,r,cb){
   if(cb)POI.cbs.push(cb);
   if(POI.busy)return;
   POI.busy=true;
-  var finish=function(list){
+  var finish=function(g){
     POI.busy=false;
-    if(list&&list.length){POI.list=list;POI.c={lat:c.lat,lng:c.lng};POI.t=Date.now()}
+    if(g){POI.g=g;POI.c={lat:c.lat,lng:c.lng};POI.t=Date.now();POI.failT=0}else POI.failT=Date.now();
     var cs=POI.cbs;POI.cbs=[];cs.forEach(function(f){try{f()}catch(e){}});
   };
-  var a='(around:'+Math.round(r)+','+c.lat.toFixed(6)+','+c.lng.toFixed(6)+')',q='[out:json][timeout:8];(';
-  ['amenity','shop','tourism','leisure','historic'].forEach(function(k){q+='node'+a+'[name]['+k+'];way'+a+'[name]['+k+'];'});
-  q+='way'+a+'[name][building];);out center 300;';
+  var q='[out:json][timeout:9];way(around:'+Math.round(r)+','+c.lat.toFixed(6)+','+c.lng.toFixed(6)+')[highway~"^('+WALK_HW+')$"][foot!~"^(no|private)$"];out geom qt;';
   var i=0;
   function next(){
     if(i>=OVP.length){finish(null);return}
-    var u=OVP[i++],done=false,to=setTimeout(function(){if(!done){done=true;next()}},6000);
+    var u=OVP[i++],done=false,to=setTimeout(function(){if(!done){done=true;next()}},9500);
     try{
       fetch(u,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(q)})
         .then(function(r){if(!r.ok)throw 0;return r.json()})
-        .then(function(j){if(done)return;done=true;clearTimeout(to);var l=poiParse(j);if(l.length)finish(l);else next()})
+        .then(function(j){if(done)return;done=true;clearTimeout(to);var g=walkBuild(j);if(g)finish(g);else next()})
         .catch(function(){if(done)return;done=true;clearTimeout(to);next()});
     }catch(e){clearTimeout(to);if(!done){done=true;next()}}
   }
   next();
 }
 function poiEnsure(){
-  if(!poiOn()||!R||POI.busy)return;
+  if(!R||POI.busy)return;
   var c=poiCenter();if(!c)return;
-  if(POI.c&&Date.now()-POI.t<25*60000&&hav(POI.c,c)<(R.area?60:450))return;
+  if(!POI.g&&POI.failT&&Date.now()-POI.failT<60000)return;
+  if(POI.g&&POI.c&&Date.now()-POI.t<25*60000&&hav(POI.c,c)<(R.area?60:450))return;
   poiLoad(c,poiRadius(),null);
 }
+/* ---- 길 연결망 탐색 ---- */
+function Heap(){this.a=[]}
+Heap.prototype.push=function(d,i){var a=this.a,k=a.length;a.push([d,i]);while(k>0){var p=(k-1)>>1;if(a[p][0]<=a[k][0])break;var t=a[p];a[p]=a[k];a[k]=t;k=p}};
+Heap.prototype.pop=function(){var a=this.a,top=a[0],last=a.pop();if(a.length){a[0]=last;var k=0,n=a.length;for(;;){var l=2*k+1,r=l+1,m=k;if(l<n&&a[l][0]<a[m][0])m=l;if(r<n&&a[r][0]<a[m][0])m=r;if(m===k)break;var t=a[m];a[m]=a[k];a[k]=t;k=m}}return top};
+/* 내 위치에서 가장 가까운 길 위의 점들(출발점). 길에서 150m 넘게 떨어져 있으면 null */
+function walkSnap(g,p){
+  var n=g.la.length,kx=111320*Math.cos(p.lat*Math.PI/180),dd=new Array(n),m=1e9,i;
+  for(i=0;i<n;i++){var dy=(g.la[i]-p.lat)*111320,dx=(g.ln[i]-p.lng)*kx,v=Math.sqrt(dx*dx+dy*dy);dd[i]=v;if(v<m)m=v}
+  if(m>150)return null;
+  var src=[];for(i=0;i<n;i++)if(dd[i]<=m+35)src.push([dd[i],i]);
+  src.sort(function(a,b){return a[0]-b[0]});
+  return src.slice(0,15);
+}
+/* 출발점들에서 길을 따라 걸은 거리(m). 닿을 수 없는 점은 Infinity */
+function walkDist(g,src,maxD){
+  var n=g.la.length,dist=new Array(n),h=new Heap(),i;
+  for(i=0;i<n;i++)dist[i]=Infinity;
+  src.forEach(function(s){if(s[0]<dist[s[1]]){dist[s[1]]=s[0];h.push(s[0],s[1])}});
+  while(h.a.length){
+    var t=h.pop(),d=t[0],u=t[1];
+    if(d>dist[u])continue;if(d>maxD)break;
+    var a=g.adj[u];
+    for(var k=0;k<a.length;k+=2){var v=a[k],nd=d+a[k+1];if(nd<dist[v]){dist[v]=nd;h.push(nd,v)}}
+  }
+  return dist;
+}
+/* 걸어서 d m쯤 되는 길 위의 점을 고른다. 방향(brg)은 참고만 하고 거리·무작위도 함께 점수에 넣는다 */
 function poiPick(from,d,brg,used,loose){
-  if(!poiOn()||!POI.list||!POI.list.length)return null;
-  var ex=(used||[]).concat(R&&R.recent||[]),best=null,bs=1e9,lo=loose?20:Math.max(35,d*0.5),hi=loose?d*2.5:d*1.6;
-  POI.list.forEach(function(q){
-    if(R.area&&hav(R.area.c,q)>R.area.r*0.96)return;
-    var dd=hav(from,q);if(dd<lo||dd>hi)return;
-    for(var i=0;i<ex.length;i++)if(hav(ex[i],q)<40)return;
-    var sc=Math.abs(angDiff(brg,bearing(from,q)))+Math.abs(dd-d)/d*60+Math.random()*50;
-    if(sc<bs){bs=sc;best=q}
-  });
+  var g=POI.g;if(!g)return null;
+  var sn=walkSnap(g,from);if(!sn)return null;
+  var ex=(used||[]).concat(R&&R.recent||[]),best=null,bs=1e9,lo=loose?20:Math.max(35,d*0.5),hi=loose?d*2.5:d*1.6,need=loose?1:2;
+  var dist=walkDist(g,sn,hi),n=g.la.length;
+  for(var i=0;i<n;i++){
+    var wd=dist[i];if(wd<lo||wd>hi||g.sp[i]<need)continue;
+    var q={lat:g.la[i],lng:g.ln[i]};
+    if(R&&R.area&&hav(R.area.c,q)>R.area.r*0.96)continue;
+    var st=hav(from,q);if(st<Math.max(20,wd*0.4))continue; /* 길이 크게 돌아가는 자리는 제외 */
+    var dup=false;for(var k=0;k<ex.length;k++)if(hav(ex[k],q)<40){dup=true;break}
+    if(dup)continue;
+    var sc=Math.abs(angDiff(brg,bearing(from,q)))+Math.abs(wd-d)/d*60+(g.sp[i]>=3?0:12)+Math.random()*50;
+    if(sc<bs){bs=sc;best={lat:q.lat,lng:q.lng,name:g.nm[i],nd:wd}}
+  }
   return best;
 }
 function placeNear(from,d,brg){
@@ -1816,9 +1857,16 @@ function stFlee(){
 }
 function reroll(){
   if(!R||R.phase!=='hunting'||R.paused||!R.monster||R.monster.boss)return;
-  var m=R.monster,pt=null;
-  for(var k=0;k<14&&!pt;k++){var cd=dest(R.pos,m.d0,Math.random()*360);if(!R.area||hav(R.area.c,cd)<=R.area.r*0.96)pt=cd}
-  if(!pt)pt=dest(R.pos,m.d0,bearing(R.pos,R.area.c));
+  var m=R.monster,pt=null,rb=Math.random()*360,cur=[{lat:m.lat,lng:m.lng}];
+  var wq=poiPick(R.pos,m.d0,rb,cur)||poiPick(R.pos,m.d0,rb,cur,true);
+  if(wq){
+    pt={lat:wq.lat,lng:wq.lng};m.place=wq.name;m.d0=Math.max(30,wq.nd);m.target=m.d0/1000*paceNow()*1000;
+    R.recent=(R.recent||[]).concat([wq]).slice(-5);
+  }else{
+    for(var k=0;k<14&&!pt;k++){var cd=dest(R.pos,m.d0,Math.random()*360);if(!R.area||hav(R.area.c,cd)<=R.area.r*0.96)pt=cd}
+    if(!pt)pt=dest(R.pos,m.d0,bearing(R.pos,R.area.c));
+    m.place='';
+  }
   m.lat=pt.lat;m.lng=pt.lng;m.elapsed=0;
   R.rangeDisp=Math.max(100,m.d0*1.3);
 }
@@ -2455,7 +2503,6 @@ function paintStage(){
   $('#st-note').textContent='마지막 단계는 시작 페이스보다 '+(c.base-last)+'초 빨라요. 보스까지 몬스터 '+((c.n-1)*c.per)+'마리를 잡고, 보스의 약점 3곳을 모두 찾아가면 클리어예요.';
   $('#st-area').hidden=!(cfg.area&&cfg.area.on);
   $('#st-start').textContent=PLAY.who==='solo'?'원정 시작':'다음 · 방 만들기';
-  $('#st-poi-on').setAttribute('aria-pressed',String(poiOn()));$('#st-poi-off').setAttribute('aria-pressed',String(!poiOn()));
   $('#st-msg').hidden=true;
 }
 function startStage(){
@@ -2469,8 +2516,6 @@ $('#k-norm').onclick=function(){if(PLAY.who==='solo'){paintSetup();show('#s-setu
 $('#k-stg').onclick=function(){paintStage();show('#s-stage')};
 $('#stage-back').onclick=function(){paintKind();show('#s-kind')};
 $('#st-start').onclick=startStage;
-$('#poi-on').onclick=$('#st-poi-on').onclick=function(){cfg.poi=true;stSave();paintSetup();paintStage()};
-$('#poi-off').onclick=$('#st-poi-off').onclick=function(){cfg.poi=false;stSave();paintSetup();paintStage()};
 function stSave(){store.set('rq_cfg',cfg)}
 hold($('#st-base-dn'),function(){cfg.stage.base=clamp(cfg.stage.base-5,180,720);stSave();paintStage()});
 hold($('#st-base-up'),function(){cfg.stage.base=clamp(cfg.stage.base+5,180,720);stSave();paintStage()});
