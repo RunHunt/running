@@ -351,7 +351,7 @@ input[type=range]::-webkit-slider-thumb{background:#fff;box-shadow:0 3px 6px rgb
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 main>section:not([hidden]){animation:rise .35s ease-out both}
-#s-setup>*,#s-mode>*,#s-mp #mp-home>*{animation:rise .5s ease-out both}
+#s-setup>*,#s-mode>*,#s-kind>*,#s-stage>*,#s-mp #mp-home>*{animation:rise .5s ease-out both}
 #s-setup>*:nth-child(2){animation-delay:.04s}#s-setup>*:nth-child(3){animation-delay:.08s}#s-setup>*:nth-child(4){animation-delay:.12s}#s-setup>*:nth-child(5){animation-delay:.16s}#s-setup>*:nth-child(6){animation-delay:.2s}#s-setup>*:nth-child(n+7){animation-delay:.24s}
 #s-mode>*:nth-child(2){animation-delay:.08s}
 .back{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;border-radius:999px;background:var(--panel);color:var(--icet);font-size:14px;margin:4px 0 2px}
@@ -414,6 +414,30 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
 .codebox b{background:linear-gradient(90deg,#1d78cc,#6a55d8);-webkit-background-clip:text;background-clip:text;color:transparent}
 .btn{letter-spacing:.02em}
 .rk{box-shadow:0 3px 8px rgba(110,90,200,.07)}
+
+.modecard.norm{--sh:#e0a21c;background:linear-gradient(135deg,#fff4d2,#ffdf9c)}
+.modecard.stg{--sh:#7a52e6;background:linear-gradient(135deg,#efe6ff,#d6c4ff)}
+.modecard.norm .ic{color:#c47a00}.modecard.stg .ic{color:#6a3fd6}
+.modecard.stg .ic{animation-delay:-1.6s}
+.modecard .rec{display:block;margin-top:5px;font-size:12px;color:#6a3fd6;font-weight:700}
+.stprev{display:flex;flex-wrap:wrap;gap:8px}
+.stprev span{display:inline-flex;flex-direction:column;align-items:center;min-width:64px;padding:7px 10px;border-radius:14px;background:#f3efff;border:2px solid #e3dcff;font-size:11px;color:var(--mute);line-height:1.25}
+.stprev span b{font-family:var(--f-display);font-size:17px;color:var(--text);font-weight:400}
+.stprev span.boss{background:linear-gradient(135deg,#fff0d0,#ffd98a);border-color:#ffc24a;color:#a86400}
+.stprev span.boss b{color:#a86400}
+.mplace{margin:-2px 0 8px;font-size:13px;color:var(--mute);font-weight:700;overflow-wrap:anywhere}
+.mplace::before{content:"";display:inline-block;width:9px;height:9px;margin-right:6px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#ff6fa6;vertical-align:-1px}
+.dcard canvas{background:radial-gradient(circle at 50% 40%,#fff,#f0ecff);border-radius:20px}
+.dcard.fresh canvas{opacity:.8;filter:saturate(.75)}
+.dcard.fresh .dno::after{content:"NEW";margin-left:6px;padding:1px 6px;border-radius:8px;background:#ff6fa6;color:#fff;font-size:10px;letter-spacing:.06em}
+.dcard.locked canvas{background:radial-gradient(circle at 50% 40%,#e6e1fa,#d3cdee)}
+.dcard.locked .dname{letter-spacing:.2em}
+.dex-thumbs-real canvas{filter:drop-shadow(0 2px 2px rgba(80,60,160,.25))}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;display:none}
+.mprof{margin-top:18px}
+#s-mode .dexlink{margin-top:12px}
+.chip.stage-chip{left:6px;right:auto;top:4px;bottom:auto;color:#6a3fd6;font-weight:700;letter-spacing:.04em}
+.chip.stage-chip.boss{color:#c2410c;background:#fff1e6}
 </style>
 
 <main class="wrap">
@@ -428,16 +452,77 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
 
   <!-- 모드 선택 -->
   <section id="s-mode">
-    <p class="modehi num" id="m-hi"></p>
-    <div class="modes">
+    <div class="modes" style="margin-top:18px">
       <button class="modecard solo" id="m-solo"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><path d="M5 21c0-4.4 3.1-7 7-7s7 2.6 7 7"/></svg></span><span class="tx"><span class="t">혼자하기</span><span class="s">내 페이스로 몬스터를 쫓아요</span></span><span class="go">›</span></button>
       <button class="modecard duo" id="m-duo"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.8-.2 4.5 1.6 4.5 4.4"/></svg></span><span class="tx"><span class="t">같이하기</span><span class="s">같은 구역에서 더 많이 잡기 대결</span></span><span class="go">›</span></button>
     </div>
+    <div class="profile mprof">
+      <div class="row">
+        <canvas class="avatar" id="m-avatar" aria-hidden="true"></canvas>
+        <div class="who"><span class="lv" id="m-p-lv"></span><span class="meta num" id="m-p-meta"></span><span class="gold-pill num" id="m-p-gold"></span></div>
+      </div>
+      <div class="prog" id="m-p-prog"></div>
+    </div>
+    <button class="dexlink" id="m-shop-open"><canvas class="av" id="m-shop-av" width="80" height="80" aria-hidden="true"></canvas><span class="txt"><span class="t">아바타 꾸미기</span><span class="s" id="m-shop-s"></span></span><span class="go">열기</span></button>
+    <button class="dexlink" id="m-dex-open"><span class="thumbs dex-thumbs-real" id="m-dex-thumbs"></span><span class="txt"><span class="t">몬스터 도감</span><span class="s" id="m-dex-s"></span></span><span class="go">열기</span></button>
+  </section>
+
+  <!-- 모드 종류 (일반 / 스테이지) -->
+  <section id="s-kind" hidden>
+    <button class="back" id="kind-back" style="margin-top:6px">← 모드 선택</button>
+    <p class="modehi num" id="k-hi"></p>
+    <div class="modes">
+      <button class="modecard norm" id="k-norm"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3 2"/></svg></span><span class="tx"><span class="t">일반 모드</span><span class="s">내 페이스, 내 목표로 몬스터를 쫓아요</span></span><span class="go">›</span></button>
+      <button class="modecard stg" id="k-stg"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4v-4h4v-4h4V8h4"/><path d="M16 4h4v4"/></svg></span><span class="tx"><span class="t">스테이지 모드</span><span class="s">단계마다 페이스가 빨라지고, 마지막 보스는 3곳을 돌아야 잡아요</span><span class="rec" id="k-rec" hidden></span></span><span class="go">›</span></button>
+    </div>
+  </section>
+
+  <!-- 스테이지 설정 -->
+  <section id="s-stage" hidden>
+    <button class="back" id="stage-back" style="margin-top:6px">← 모드 종류</button>
+    <h2>스테이지 모드</h2>
+    <p class="note" style="margin-top:4px">몬스터를 잡을 때마다 다음 단계로 올라가요. 단계가 오를수록 목표 페이스가 빨라지고, 목표 시간을 너무 넘기면 몬스터가 도망가요. 마지막 단계의 보스는 서로 떨어진 <b>3곳의 약점</b>을 모두 찾아가야 쓰러뜨려요.</p>
+
+    <div class="field">
+      <div class="top"><span class="badge b-mint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 2.5h5M12 2.5v3.5"/></svg></span><span class="lab">시작 페이스</span><span class="hint">1단계 목표 (1km)</span></div>
+      <div class="stepper"><button id="st-base-dn" aria-label="시작 페이스 빠르게">−</button><div class="val num"><span id="st-base-v"></span><small id="st-base-s"></small></div><button id="st-base-up" aria-label="시작 페이스 느리게">+</button></div>
+    </div>
+
+    <div class="field">
+      <div class="top"><span class="badge b-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></span><span class="lab">단계마다 빨라져요</span></div>
+      <div class="stepper"><button id="st-step-dn" aria-label="줄이기">−</button><div class="val num"><span id="st-step-v"></span><small>/km 씩</small></div><button id="st-step-up" aria-label="늘리기">+</button></div>
+    </div>
+
+    <div class="field">
+      <div class="top"><span class="badge b-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4v-4h4v-4h4V8h4"/></svg></span><span class="lab">단계 수</span><span class="hint">보스 단계 포함</span></div>
+      <div class="stepper"><button id="st-n-dn" aria-label="단계 줄이기">−</button><div class="val num"><span id="st-n-v"></span></div><button id="st-n-up" aria-label="단계 늘리기">+</button></div>
+      <div class="top" style="gap:8px"><span class="lab" style="font-size:16px">단계마다 잡을 몬스터</span></div>
+      <div class="stepper"><button id="st-per-dn" aria-label="줄이기">−</button><div class="val num"><span id="st-per-v"></span></div><button id="st-per-up" aria-label="늘리기">+</button></div>
+    </div>
+
+    <div class="field">
+      <div class="top"><span class="badge b-lav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="lab">단계별 목표 페이스</span></div>
+      <div class="stprev" id="st-prev"></div>
+      <p class="note" id="st-note"></p>
+    </div>
+
+    <div class="field">
+      <div class="top"><span class="badge b-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span class="lab">실제 장소에 배치</span><span class="hint">지도 데이터 사용</span></div>
+      <div class="seg" role="group" aria-label="실제 장소에 배치">
+        <button id="st-poi-on" aria-pressed="true">켜기</button>
+        <button id="st-poi-off" aria-pressed="false">끄기</button>
+      </div>
+      <p class="note">오픈스트리트맵에서 근처의 가게·공원·역·건물 같은 <b>실제로 갈 수 있는 장소</b>를 찾아 그곳에 몬스터를 둬요. 지도를 못 받으면 임의 위치를 써요.</p>
+    </div>
+
+    <p class="note" id="st-area" style="margin-top:12px" hidden>러닝 영역은 일반 모드에서 정해 둔 설정을 따라요.</p>
+    <p class="note" id="st-msg" style="margin-top:10px;color:var(--gold)" hidden></p>
+    <button class="cta" id="st-start">원정 시작</button>
   </section>
 
   <!-- 설정 -->
   <section id="s-setup" hidden>
-    <button class="back" id="setup-back" style="margin-top:6px">← 모드 선택</button>
+    <button class="back" id="setup-back" style="margin-top:6px">← 모드 종류</button>
 
     <div class="profile">
       <div class="row">
@@ -501,6 +586,15 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
       <p class="note" id="dest-note" hidden>도착지를 정하면 도착했을 때 원정이 끝나고 보스 몬스터가 기다려요. 위의 목표(거리, 시간, 자유)는 쓰이지 않아요.</p>
     </div>
 
+    <div class="field">
+      <div class="top"><span class="badge b-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span class="lab">실제 장소에 배치</span><span class="hint">지도 데이터 사용</span></div>
+      <div class="seg" role="group" aria-label="실제 장소에 배치">
+        <button id="poi-on" aria-pressed="true">켜기</button>
+        <button id="poi-off" aria-pressed="false">끄기</button>
+      </div>
+      <p class="note">오픈스트리트맵에서 근처의 가게·공원·역·건물 같은 <b>실제로 갈 수 있는 장소</b>를 찾아 그곳에 몬스터를 둬요. 지도를 못 받으면 임의 위치를 써요.</p>
+    </div>
+
     <div class="field" id="area-field">
       <div class="top"><span class="badge b-lav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-dasharray="3.2 3.2"/><circle cx="12" cy="12" r="2.3" fill="currentColor"/></svg></span><span class="lab">러닝 영역</span><span class="hint" id="area-hint"></span></div>
       <div class="seg" role="group" aria-label="러닝 영역">
@@ -559,6 +653,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
       <div class="chip num tr" id="hd-chip"></div>
       <div class="chip num tl" id="area-chip" hidden></div>
       <div class="chip num gold-chip" id="gold-chip" hidden></div>
+      <div class="chip num stage-chip" id="stage-chip" hidden></div>
       <button class="rdmode" id="rd-mode"></button>
     </div>
 
@@ -575,6 +670,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
     <div class="mpanel" id="p-hunt" hidden>
       <div class="mhead"><span class="mname" id="m-name"></span><span class="mdir"><svg id="m-arrow" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l7 17-7-4.2-7 4.2z" fill="currentColor"/></svg><span id="m-dir"></span></span></div>
       <div class="mdist num" id="m-dist"></div>
+      <div class="mplace" id="m-place" hidden></div>
       <div class="mbar"><i id="m-bar"></i></div>
       <div class="mrow num"><span class="bonus" id="m-bonus"></span><span id="m-elapsed"></span></div>
       <div class="mlinks"><a id="lk-kakao" target="_blank" rel="noopener">카카오맵에서 위치 보기</a><a id="lk-google" target="_blank" rel="noopener">구글 지도</a></div>
@@ -613,6 +709,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
     <button class="back" id="mp-back">← 돌아가기</button>
     <h2>멀티플레이</h2>
     <p class="note" style="margin-top:4px">같은 구역에서 정해진 시간 동안 더 많은 몬스터를 잡은 사람이 이겨요. 1~3등은 보너스 골드도 받아요.</p>
+    <p class="note" id="mp-mode-note" style="margin-top:2px;color:var(--icet)" hidden></p>
 
     <div id="mp-home">
       <div class="field">
@@ -645,6 +742,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
 
     <div id="mp-lobby" hidden>
       <div class="codebox"><span class="l">방 코드 · 친구에게 알려 주세요</span><b id="lb-code"></b></div>
+      <button class="btn ghost" id="lb-copy" style="margin-top:10px">코드 복사 · 공유하기</button>
       <div class="mpanel" style="margin-top:12px"><p id="lb-info" style="font-size:14px"></p><a id="lb-map" target="_blank" rel="noopener" style="font-size:13px">지도에서 영역 중심 보기</a><p class="note" id="lb-dist"></p></div>
       <ul class="plist" id="lb-list"></ul>
       <p class="note" id="lb-conn" style="margin-top:8px"></p>
@@ -692,6 +790,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
     <button class="dexlink" id="d-dex" style="margin-top:14px"><span><span class="t">몬스터 도감</span><span class="s" id="d-dexs"></span></span><span class="go">보기 →</span></button>
     <button class="cta" id="again" style="margin-top:20px">다시 설정하기</button>
   </section>
+<canvas id="confetti" aria-hidden="true"></canvas>
 </main>
 
 <!-- 시간 정지 -->
@@ -721,8 +820,16 @@ if(cfg.goalType==='dest'){cfg.goalType='dist';cfg.destMode=(cfg.dest&&cfg.dest.l
 if(cfg.dest&&cfg.dest.loop)cfg.dest=null;
 if(!cfg.destMode)cfg.destMode='none';
 if(!cfg.loopKm)cfg.loopKm=3;
-function destOn(){return cfg.destMode==='place'||cfg.destMode==='loop'}
-function isFree(){return cfg.goalType==='free'&&!destOn()}
+cfg.stage=Object.assign({base:360,step:15,n:5,per:3},cfg.stage||{});
+if(cfg.poi===undefined)cfg.poi=true;
+function poiOn(){return cfg.poi!==false}
+function stOn(){return !!(R&&R.st)}
+function destOn(){return !stOn()&&(cfg.destMode==='place'||cfg.destMode==='loop')}
+function isFree(){return !stOn()&&cfg.goalType==='free'&&!destOn()}
+function stagePace(c,k){return Math.max(180,c.base-(k-1)*c.step)}
+function mkSt(c){return {base:c.base,step:c.step,n:c.n,per:c.per,k:1,cnt:0,parts:null,done:0,total:0,shown:false}}
+function paceNow(){return R&&R.st?stagePace(R.st,Math.min(R.st.k,R.st.n)):cfg.paceSec}
+function stSc(){if(!R||!R.st)return 0;return (R.stageClear?100:0)+R.kills+(R.st.done||0)}
 var prof=Object.assign({exp:0,runs:0,kills:0,km:0,dex:{}},store.get('rq_prof',{}));
 
 /* ---------- 골드 · 아바타 데이터 ---------- */
@@ -985,7 +1092,7 @@ function paintDex(){
     var ok=dexFilter==='all'||(dexFilter==='won'&&won)||(dexFilter==='todo'&&open&&!won)||(dexFilter==='lock'&&!open);
     if(!ok)return;shown++;
     var card=document.createElement('div');card.className='dcard'+(open?'':' locked')+(won?' done':'');
-    var c=document.createElement('canvas');spriteCanvas(c,m,4,won?null:['#b4acdd','#cbc5ec']);
+    var c=document.createElement('canvas');spriteCanvas(c,m,4,open?null:['#7d76ae','#9a94c6']);if(open&&!won)card.classList.add('fresh');
     var no=document.createElement('div');no.className='dno';no.textContent='No.'+pad(i+1);
     var nm=document.createElement('div');nm.className='dname';nm.textContent=open?m.name:'???';
     var nt=document.createElement('div');nt.className='dnote';
@@ -1065,11 +1172,11 @@ function paintArea(){
   $('#ar-name').textContent=a.c?(a.c.label||'선택한 위치'):'중심을 아직 정하지 않았어요';
   $('#ar-sub').textContent=a.c?a.c.lat.toFixed(4)+', '+a.c.lng.toFixed(4):'';
 }
-function paintThumbs(){
-  var box=$('#dex-thumbs');box.innerHTML='';var lv=curLv();
+function paintThumbs(id){
+  var box=$(id||'#dex-thumbs');box.innerHTML='';var lv=curLv();
   MON.filter(function(m){return m.lv<=lv}).slice(-4).forEach(function(m){
-    var c=document.createElement('canvas'),won=((prof.dex||{})[m.id]||{}).kills>0;
-    spriteCanvas(c,m,2,won?null:['#b4acdd','#cbc5ec']);box.appendChild(c);
+    var c=document.createElement('canvas');
+    spriteCanvas(c,m,2,null);box.appendChild(c);
   });
 }
 function paintSetup(){
@@ -1102,9 +1209,11 @@ function paintSetup(){
     txt=isFree()?'<b>자유 달리기</b>예요. 몬스터는 계속 나타나요!<span class="sub">종료 버튼을 누를 때까지 이어져요</span>':'몬스터 약 <b>'+n+'마리</b>가 기다리고 있어요!<span class="sub">한 마리까지 평균 약 '+Math.round(d/10)*10+'m, 달려서 약 2분 30초</span>';
   }
   $('#forecast').innerHTML=txt;
+  $('#poi-on').setAttribute('aria-pressed',String(poiOn()));$('#poi-off').setAttribute('aria-pressed',String(!poiOn()));
   $('#start-msg').hidden=true;
 }
 function canStart(){
+  if(STRUN||MPRUN)return true;
   var m=$('#start-msg');
   if(cfg.destMode==='place'&&!cfg.dest){
     m.textContent='도착지를 먼저 정해 주세요.';m.hidden=false;
@@ -1248,7 +1357,8 @@ function drawRunner(g,x,y,s,t,still,L,flip){
 function paintAvatar(){
   var c=$('#avatar'),d=2;c.width=56*d;c.height=56*d;
   var g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);drawRunner(g,28,53,0.82,0,true,curLook());
-  var c2=$('#shop-av');if(c2){var g2=c2.getContext('2d');g2.setTransform(1,0,0,1,0,0);g2.clearRect(0,0,80,80);drawRunner(g2,40,74,1.05,0,true,curLook())}
+  ['#shop-av','#m-shop-av'].forEach(function(id){var c2=$(id);if(c2){var g2=c2.getContext('2d');g2.setTransform(1,0,0,1,0,0);g2.clearRect(0,0,80,80);drawRunner(g2,40,74,1.05,0,true,curLook())}});
+  var c3=$('#m-avatar');if(c3){c3.width=56*d;c3.height=56*d;var g3=c3.getContext('2d');g3.setTransform(d,0,0,d,0,0);drawRunner(g3,28,53,0.82,0,true,curLook())}
 }
 function hills(g,w,h,off,base,amp,col,f1,f2){
   g.fillStyle=col;g.beginPath();g.moveTo(0,h);
@@ -1307,7 +1417,7 @@ function drawHero(ts){
   g.setTransform(dpr,0,0,dpr,0,0);
   drawScene(g,w,h,t,k,sc);
   var ground=h*0.915;
-  var bx=wrap(t*46*k,w+90*k)-45*k,bpx=Math.max(2,Math.round(k*2.4));
+  var bx=w*0.5+wrap(t*46*k,w*0.5+45*k),bpx=Math.max(2,Math.round(k*2.4));
   drawSprite(g,MON[1],bx,h*0.3+Math.sin(t*4)*7*k,bpx);
   var hop=Math.abs(Math.sin(t*3.2))*17*k,spx=Math.max(3,Math.round(k*3.2));
   g.fillStyle='rgba(12,11,38,.35)';g.beginPath();g.ellipse(w*0.76,ground+1,spx*5.5*(1-hop/(40*k)),spx*1.3,0,0,6.3);g.fill();
@@ -1324,6 +1434,7 @@ function stopHero(){if(heroRaf){cancelAnimationFrame(heroRaf);heroRaf=null}}
 window.addEventListener('resize',function(){if(!$('#hero-wrap').hidden)drawHero(performance.now())});
 
 /* ---------- run state ---------- */
+var STRUN=null,PLAY={who:'solo'};
 var R=null,tickIv=null,raf=null,ac=null,bannerT=null,endT=null;
 function beep(freqs){
   try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
@@ -1331,7 +1442,33 @@ function beep(freqs){
 }
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 function setNotice(msg){var n=$('#notice');if(msg){n.textContent=msg;n.hidden=false}else n.hidden=true}
-function show(id){['#s-mode','#s-setup','#s-run','#s-dex','#s-done','#s-shop','#s-mp'].forEach(function(s){$(s).hidden=(s!==id)});window.scrollTo(0,0);var hv=(id==='#s-setup'||id==='#s-mode');$('#hero-wrap').hidden=!hv;if(hv)startHero();else stopHero();if(id==='#s-shop')startShopAnim();else stopShopAnim()}
+var CF={raf:0};
+function confetti(n,ms){
+  var cv=$('#confetti');if(RM||!cv||!n)return;
+  var w=cv.width=window.innerWidth,h=cv.height=window.innerHeight,g=cv.getContext('2d'),cols=['#ffbd2e','#ff6fa6','#55b2f5','#14c2a0','#9a6bff','#ff7a45'],ps=[],i;
+  for(i=0;i<n;i++)ps.push({x:Math.random()*w,y:-20-Math.random()*h*0.5,vx:(Math.random()-.5)*2.2,vy:2+Math.random()*3.4,r:5+Math.random()*6,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[i%cols.length],ci:Math.random()<.4});
+  var t0=performance.now();cancelAnimationFrame(CF.raf);cv.style.display='block';
+  function step(t){
+    var e=t-t0,alive=false;g.clearRect(0,0,w,h);
+    ps.forEach(function(q){
+      q.x+=q.vx+Math.sin(q.a)*.6;q.y+=q.vy;q.a+=q.va;if(q.y<h+20)alive=true;
+      g.save();g.translate(q.x,q.y);g.rotate(q.a);g.globalAlpha=Math.max(0,Math.min(1,(ms-e)/600));g.fillStyle=q.c;
+      if(q.ci){g.beginPath();g.arc(0,0,q.r*.55,0,7);g.fill()}else g.fillRect(-q.r/2,-q.r/3,q.r,q.r*.66);
+      g.restore();
+    });
+    if(e<ms&&alive)CF.raf=requestAnimationFrame(step);else{g.clearRect(0,0,w,h);cv.style.display='none'}
+  }
+  CF.raf=requestAnimationFrame(step);
+}
+function confettiStop(){cancelAnimationFrame(CF.raf);var cv=$('#confetti');if(cv)cv.style.display='none'}
+var CU={raf:0};
+function countUp(el,to,ms){
+  cancelAnimationFrame(CU.raf);
+  if(RM||!to){el.textContent=to;return}
+  var t0=performance.now();
+  (function st(t){var f=Math.min(1,(t-t0)/(ms||900)),e=1-Math.pow(1-f,3);el.textContent=Math.round(to*e);if(f<1)CU.raf=requestAnimationFrame(st);else el.textContent=to})(t0);
+}
+function show(id){if(id!=='#s-done')confettiStop();['#s-mode','#s-kind','#s-stage','#s-setup','#s-run','#s-dex','#s-done','#s-shop','#s-mp'].forEach(function(s){$(s).hidden=(s!==id)});window.scrollTo(0,0);var hv=(id==='#s-setup'||id==='#s-mode'||id==='#s-kind'||id==='#s-stage');$('#hero-wrap').hidden=!hv;if(hv)startHero();else stopHero();if(id==='#s-shop')startShopAnim();else stopShopAnim()}
 
 /* ---------- heading (나침반 + GPS 진행방향) ---------- */
 var cmp={on:false,denied:false};
@@ -1400,8 +1537,8 @@ function startRun(){
   R={phase:'locating',paused:false,active:0,hunt:0,pausedMs:0,dist:0,huntDist:0,kills:0,bonus:0,exp:0,
      pos:null,last:null,heading:null,trail:[],monster:null,restLeft:0,restTotal:0,log:[],watch:null,nwatch:null,wl:null,t0:performance.now(),locWarn:0,
      lastTick:performance.now(),rangeDisp:100,acc:null,lastKill:null,startLv:curLv(),savedDist:0,cmpHd:null,cmpT:0,gpsHd:null,gpsHdT:0,mvHd:null,mvT:0,anchor:null,speed:0,spdT:0,hdSrc:'',lastMoveT:0,hdDisp:null,area:null,
-     loop:cfg.destMode==='loop',returning:false,fin:null,finStart:null,reachedDest:false,gold:0,moveT:0,faceL:false,mScr:null,lunge:null,mp:MPRUN||null};
-  MPRUN=null;
+     loop:cfg.destMode==='loop',returning:false,fin:null,finStart:null,reachedDest:false,gold:0,moveT:0,faceL:false,mScr:null,lunge:null,mp:MPRUN||null,st:(MPRUN&&MPRUN.stage)?mkSt(MPRUN.stage):(STRUN?mkSt(STRUN):null),stageClear:false};
+  MPRUN=null;STRUN=null;
   show('#s-run');setNotice('');$('#pause').hidden=true;
   $('#banner').hidden=true;
   $('#btn-end').innerHTML='종료';
@@ -1416,7 +1553,9 @@ function abortRun(msg){
   R.phase='done';stopGps();stopCompass();unlock();clearInterval(tickIv);cancelAnimationFrame(raf);
   $('#pause').hidden=true;$('#radar-wrap').classList.remove('frozen');
   clearInterval(MP.syncIv);mpRestore();$('#mp-board').hidden=true;
-  R=null;paintSetup();show('#s-setup');
+  var wasSt=!!R.st&&!R.mp;R=null;
+  if(wasSt){paintStage();show('#s-stage');var m2=$('#st-msg');m2.textContent=msg;m2.hidden=false;return}
+  paintSetup();show('#s-setup');
   var m=$('#start-msg');m.textContent=msg;m.hidden=false;
 }
 var bgPlugin=null;
@@ -1484,6 +1623,15 @@ function onPos(p){
       if(R.loop)R.fin={lat:p.lat,lng:p.lng};
       else if(cfg.dest)R.fin={lat:cfg.dest.lat,lng:cfg.dest.lng};
     }
+    if(poiOn()){
+      if(R.poiWait){render();return}
+      if(!R.poiTried){
+        R.poiTried=true;R.poiWait=true;var mineR=R,fired=false;
+        var go=function(){if(fired||R!==mineR)return;fired=true;R.poiWait=false;if(R.phase==='locating'&&R.last){spawn();render()}};
+        setTimeout(go,6500);
+        poiLoad(poiCenter(),poiRadius(),go);render();return;
+      }
+    }
     spawn();render();return;
   }
   if(R.paused){R.pos=p;R.last=p;return}
@@ -1502,14 +1650,17 @@ function onPos(p){
 }
 var KILL_R=5; /* 몬스터에게 이 거리(m) 안으로 다가가면 처치 */
 function checkArrive(){
+  if(R.st&&R.st.parts){bossHit();return}
   var m=R.monster;if(!m)return;
   if(hav(R.pos,m)<=KILL_R)kill();
 }
 
 function bossIdx(){var lv=curLv(),b=0;MON.forEach(function(m,i){if(m.lv<=lv)b=i});return b}
 function spawn(){
-  var win=90+Math.random()*120,d=win/cfg.paceSec*1000,brg=null,boss=false,fixed=null;
-  if(cfg.goalType==='dist'&&!destOn()){
+  poiEnsure();
+  if(R.st&&R.st.k>=R.st.n){spawnBoss();return}
+  var win=90+Math.random()*120,d=win/paceNow()*1000,brg=null,boss=false,fixed=null;
+  if(cfg.goalType==='dist'&&!destOn()&&!R.st){
     var rem=cfg.goalDist*1000-R.dist;
     if(rem<60){finish();return}
     if(d>rem)d=Math.max(60,rem);
@@ -1526,7 +1677,8 @@ function spawn(){
   if(!boss)d=Math.max(60,d);
   if(R.area&&!boss)d=Math.min(d,Math.max(60,R.area.r*0.9));
   if(brg==null)brg=R.heading!=null?R.heading+(Math.random()-0.5)*120:Math.random()*360;
-  var pt=fixed?{lat:fixed.lat,lng:fixed.lng}:null;
+  var pt=fixed?{lat:fixed.lat,lng:fixed.lng}:null,place='';
+  if(!pt){var pq=poiPick(R.pos,d,brg);if(pq){pt={lat:pq.lat,lng:pq.lng};place=pq.name;R.recent=(R.recent||[]).concat([pq]).slice(-5)}}
   if(!pt){
     if(R.area){
       for(var k=0;k<18&&!pt;k++){
@@ -1538,12 +1690,129 @@ function spawn(){
     }else pt=dest(R.pos,d,brg);
   }
   if(!boss)d=Math.max(30,hav(R.pos,pt));
-  var sec=d/1000*cfg.paceSec;
+  var sec=d/1000*paceNow();
   var idx=boss?bossIdx():pickMonster(sec);
-  R.monster={lat:pt.lat,lng:pt.lng,d0:d,target:sec*1000,elapsed:0,idx:idx,boss:boss};
+  R.monster={lat:pt.lat,lng:pt.lng,d0:d,target:sec*1000,elapsed:0,idx:idx,boss:boss,place:place};
   R.phase='hunting';
   var dd=hav(R.pos,R.monster);R.rangeDisp=Math.max(100,dd*1.3);
   beep(boss?[196,262,330]:[196,262]);buzz(boss?[60,40,60]:60);
+  if(R.st&&!R.st.shown){R.st.shown=true;banner('STAGE 1','목표 페이스 '+fmtPace(stagePace(R.st,1))+'/km',2600)}
+}
+/* ---------- 스테이지 모드 ---------- */
+/* ---------- 실제 장소(OpenStreetMap) ---------- */
+var POI={list:[],c:null,t:0,busy:false,cbs:[]};
+var OVP=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+function poiCenter(){return R&&R.area?R.area.c:(R&&R.pos)}
+function poiRadius(){return R&&R.area?clamp(R.area.r+100,300,1500):900}
+function poiParse(j){
+  var out=[],seen={};
+  ((j&&j.elements)||[]).forEach(function(e){
+    var t=e.tags||{};if(!t.name)return;
+    if(t.access==='private'||t.access==='no')return;
+    var la=e.lat!=null?e.lat:(e.center&&e.center.lat),ln=e.lon!=null?e.lon:(e.center&&e.center.lon);
+    if(la==null||ln==null)return;
+    var k=t.name+'|'+la.toFixed(3)+'|'+ln.toFixed(3);if(seen[k])return;seen[k]=1;
+    out.push({lat:la,lng:ln,name:t.name});
+  });
+  return out.slice(0,400);
+}
+function poiLoad(c,r,cb){
+  if(cb)POI.cbs.push(cb);
+  if(POI.busy)return;
+  POI.busy=true;
+  var finish=function(list){
+    POI.busy=false;
+    if(list&&list.length){POI.list=list;POI.c={lat:c.lat,lng:c.lng};POI.t=Date.now()}
+    var cs=POI.cbs;POI.cbs=[];cs.forEach(function(f){try{f()}catch(e){}});
+  };
+  var a='(around:'+Math.round(r)+','+c.lat.toFixed(6)+','+c.lng.toFixed(6)+')',q='[out:json][timeout:8];(';
+  ['amenity','shop','tourism','leisure','historic'].forEach(function(k){q+='node'+a+'[name]['+k+'];way'+a+'[name]['+k+'];'});
+  q+='way'+a+'[name][building];);out center 300;';
+  var i=0;
+  function next(){
+    if(i>=OVP.length){finish(null);return}
+    var u=OVP[i++],done=false,to=setTimeout(function(){if(!done){done=true;next()}},6000);
+    try{
+      fetch(u,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(q)})
+        .then(function(r){if(!r.ok)throw 0;return r.json()})
+        .then(function(j){if(done)return;done=true;clearTimeout(to);var l=poiParse(j);if(l.length)finish(l);else next()})
+        .catch(function(){if(done)return;done=true;clearTimeout(to);next()});
+    }catch(e){clearTimeout(to);if(!done){done=true;next()}}
+  }
+  next();
+}
+function poiEnsure(){
+  if(!poiOn()||!R||POI.busy)return;
+  var c=poiCenter();if(!c)return;
+  if(POI.c&&Date.now()-POI.t<25*60000&&hav(POI.c,c)<(R.area?60:450))return;
+  poiLoad(c,poiRadius(),null);
+}
+function poiPick(from,d,brg,used,loose){
+  if(!poiOn()||!POI.list||!POI.list.length)return null;
+  var ex=(used||[]).concat(R&&R.recent||[]),best=null,bs=1e9,lo=loose?20:Math.max(35,d*0.5),hi=loose?d*2.5:d*1.6;
+  POI.list.forEach(function(q){
+    if(R.area&&hav(R.area.c,q)>R.area.r*0.96)return;
+    var dd=hav(from,q);if(dd<lo||dd>hi)return;
+    for(var i=0;i<ex.length;i++)if(hav(ex[i],q)<40)return;
+    var sc=Math.abs(angDiff(brg,bearing(from,q)))+Math.abs(dd-d)/d*60+Math.random()*50;
+    if(sc<bs){bs=sc;best=q}
+  });
+  return best;
+}
+function placeNear(from,d,brg){
+  for(var k=0;k<26;k++){
+    var bb=k<8?brg+(Math.random()-0.5)*50:Math.random()*360,dd=k<16?d:d*0.6,c=dest(from,dd,bb);
+    if(!R.area||hav(R.area.c,c)<=R.area.r*0.96)return c;
+  }
+  if(R.area){var dc=hav(from,R.area.c);return dest(from,Math.max(30,Math.min(d,dc)),bearing(from,R.area.c))}
+  return dest(from,d,brg);
+}
+function stTarget(){
+  var s=R.st,best=null,bd=1e9;
+  s.parts.forEach(function(p){if(p.done)return;var dd=hav(R.pos,p);if(dd<bd){bd=dd;best=p}});
+  if(!best){R.monster=null;return}
+  R.monster={lat:best.lat,lng:best.lng,d0:Math.max(bd,60),target:bd*paceNow(),elapsed:0,idx:bossIdx(),boss:true,part:true,place:best.name||''};
+  R.rangeDisp=Math.max(100,bd*1.3);
+}
+function spawnBoss(){
+  var s=R.st,d=clamp(120/paceNow()*1000,200,500),b=R.heading!=null?R.heading:Math.random()*360,from=R.pos,pts=[];
+  poiEnsure();var used=[];
+  for(var i=0;i<3;i++){
+    var q=poiPick(from,d,b,used)||poiPick(from,d,b,used,true),nm='';
+    if(q){nm=q.name;used.push(q)}else q=placeNear(from,d,b);
+    pts.push({lat:q.lat,lng:q.lng,done:false,name:nm});from=q;b+=110+Math.random()*40;
+  }
+  s.parts=pts;s.done=0;s.total=d*3;
+  stTarget();
+  var far=0;pts.forEach(function(q){far=Math.max(far,hav(R.pos,q))});R.rangeDisp=Math.max(100,far*1.3);
+  R.phase='hunting';
+  banner('보스전!','약점 3곳을 모두 찾아가세요',3400);beep([196,262,330,392]);buzz([60,40,60]);
+}
+function bossHit(){
+  var s=R.st,hit=0;
+  s.parts.forEach(function(q){if(!q.done&&hav(R.pos,q)<=KILL_R){q.done=true;hit++;s.done++}});
+  if(!hit)return;
+  if(R.mp){R.mp.lastKill=serverNow();setTimeout(mpSync,50)}
+  if(s.done>=s.parts.length){
+    var m=R.monster;if(!m){R.finishing=true;R.stageClear=true;finish();return}
+    m.d0=Math.max(m.d0,s.total);R.stageClear=true;kill();return;
+  }
+  var g=15;R.gold=(R.gold||0)+g;R.exp+=20;prof.gold=(prof.gold||0)+g;prof.exp+=20;saveProf();
+  banner('약점 파괴! '+s.done+'/'+s.parts.length,'+'+g+' G · +20 EXP',2200);beep([392,523,659]);buzz([80,40,80]);
+  stTarget();render();
+}
+function stAdvance(){
+  var s=R.st;s.cnt++;
+  if(s.k<s.n&&s.cnt>=s.per){
+    s.k++;s.cnt=0;var np=stagePace(s,s.k);
+    if(s.k>=s.n)banner('보스 단계!','다음은 보스전 · 목표 페이스 '+fmtPace(np)+'/km',3400);
+    else banner('STAGE '+s.k,'목표 페이스 '+fmtPace(np)+'/km · 페이스 업!',3000);
+    beep([440,554,659,880]);buzz([80,40,80,40,160]);
+  }
+}
+function stFlee(){
+  banner('도망쳤어요!','너무 느렸어요. 다음 몬스터를 쫓아요',2000);beep([220,165]);buzz([200]);
+  R.monster=null;spawn();render();
 }
 function reroll(){
   if(!R||R.phase!=='hunting'||R.paused||!R.monster||R.monster.boss)return;
@@ -1577,9 +1846,10 @@ function kill(){
     banner('처치!',sub,1900);beep([392,523,659]);buzz([80,40,80]);
   }
   R.monster=null;
-  if(m.boss){R.reachedDest=true;finish();return}
+  if(m.boss){if(!R.st)R.reachedDest=true;finish();return}
+  if(R.st)stAdvance();
   if(goalDone()){finish();return}
-  if(cfg.goalType==='dist'&&cfg.goalDist*1000-R.dist<60){finish();return}
+  if(cfg.goalType==='dist'&&!R.st&&cfg.goalDist*1000-R.dist<60){finish();return}
   if(cfg.rest>0){R.phase='resting';R.restLeft=cfg.rest*1000;R.restTotal=cfg.rest*1000}
   else spawn();
   render();
@@ -1589,7 +1859,7 @@ function banner(a,b,ms){
   el.style.animation='none';void el.offsetWidth;el.style.animation='';
   clearTimeout(bannerT);bannerT=setTimeout(function(){el.hidden=true},ms||1900);
 }
-function goalDone(){if(R&&R.mp)return serverNow()>=R.mp.endAt;return destOn()?false:cfg.goalType==='dist'?R.dist>=cfg.goalDist*1000:cfg.goalType==='time'?R.active>=cfg.goalMin*60000:false}
+function goalDone(){if(R&&R.mp)return serverNow()>=R.mp.endAt;if(R&&R.st)return false;return destOn()?false:cfg.goalType==='dist'?R.dist>=cfg.goalDist*1000:cfg.goalType==='time'?R.active>=cfg.goalMin*60000:false}
 
 function tick(){
   if(!R||R.phase==='done')return;
@@ -1601,6 +1871,7 @@ function tick(){
   updHeading();
   if(R.phase==='hunting'){
     R.hunt+=dt;if(R.monster)R.monster.elapsed+=dt;
+    if(R.st&&R.monster&&!R.monster.boss&&R.monster.elapsed>Math.max(R.monster.target*1.6,R.monster.target+20000)){stFlee();return}
   }else if(R.phase==='resting'){
     R.restLeft-=dt;
     if(R.restLeft<=0){spawn()}
@@ -1626,10 +1897,12 @@ function finish(){
   R.phase='done';stopGps();stopCompass();unlock();clearInterval(tickIv);
   $('#pause').hidden=true;$('#radar-wrap').classList.remove('frozen');
   var before=R.startLv;
-  prof.km+=(R.dist-R.savedDist)/1000;R.savedDist=R.dist;prof.runs++;store.set('rq_prof',prof);
+  prof.km+=(R.dist-R.savedDist)/1000;R.savedDist=R.dist;prof.runs++;
+  if(R.st){prof.sbest=Math.max(prof.sbest||0,R.stageClear?R.st.n:R.st.k);if(R.stageClear)prof.sclear=(prof.sclear||0)+1}
+  store.set('rq_prof',prof);
   var after=curLv();
-  $('#d-title').textContent=R.mp?'대결 종료':R.reachedDest?'도착 완료':(isFree()?'자유 달리기 종료':(goalDone()?'목표 달성':'원정 종료'));
-  $('#d-exp').textContent=R.exp;
+  $('#d-title').textContent=R.stageClear?'스테이지 클리어!':R.st?'스테이지 종료':R.mp?'대결 종료':R.reachedDest?'도착 완료':(isFree()?'자유 달리기 종료':(goalDone()?'목표 달성':'원정 종료'));
+  countUp($('#d-exp'),R.exp,1000);
   $('#d-gold').textContent='+'+(R.gold||0)+' G · 보유 '+prof.gold+' G';
   $('#d-shops').textContent='보유 '+prof.gold+' G로 꾸며 보세요';
   var lu=$('#d-lvup');if(after>before){lu.textContent='레벨 업! Lv.'+before+' → Lv.'+after;lu.hidden=false}else lu.hidden=true;
@@ -1645,7 +1918,7 @@ function finish(){
   });
   $('#d-dexs').textContent=dexSummary();
   var fr=isFree(),dcs=$('#s-done').querySelectorAll('.stats>div');
-  var sv=fr?[[R.kills+'마리','처치'],[String(R.bonus),'보너스 처치'],[String(R.exp),'획득 EXP'],['Lv.'+after,'현재 레벨']]
+  var sv=R.st?[[R.stageClear?'클리어':'STAGE '+Math.min(R.st.k,R.st.n),'결과'],[R.kills+'마리','처치'],[fmtTime(R.active),'시간'],[(R.dist/1000).toFixed(2)+' km','거리']]:fr?[[R.kills+'마리','처치'],[String(R.bonus),'보너스 처치'],[String(R.exp),'획득 EXP'],['Lv.'+after,'현재 레벨']]
            :[[(R.dist/1000).toFixed(2)+' km','거리'],[fmtTime(R.active),'시간'],[R.huntDist>50?fmtPace(R.hunt/R.huntDist):"--'--\"",'평균 페이스'],[R.kills+'마리 · '+R.bonus,'처치 · 보너스']];
   for(var si=0;si<4;si++){dcs[si].children[0].textContent=sv[si][0];dcs[si].children[1].textContent=sv[si][1]}
   $('#s-done').classList.toggle('free',fr);
@@ -1653,9 +1926,10 @@ function finish(){
   $('#d-log').innerHTML=rows||'<tr><td colspan="4" style="color:var(--mute)">처치한 몬스터가 없어요.</td></tr>';
   beep([523,659,784,1047]);buzz([100,50,100,50,200]);
   var mpr=R.mp;$('#d-rank').hidden=!mpr;
-  if(mpr)mpFinish(mpr,{kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos});
+  if(mpr)mpFinish(mpr,{kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos,sg:stSc(),stg:R.st?R.st.k:0});
   mpRestore();
   show('#s-done');
+  confetti(R.stageClear?170:(after>before?120:(R.kills>0?45:0)),R.stageClear?4500:3000);
 }
 
 /* ---------- render (DOM) ---------- */
@@ -1663,12 +1937,19 @@ var DIRS=['북','북동','동','남동','남','남서','서','북서'],ARR=['↑
 function render(){
   if(!R||R.phase==='done')return;
   var gc=$('#gold-chip');gc.hidden=false;gc.textContent='+'+(R.gold||0)+' G';
+  var sch=$('#stage-chip');sch.hidden=!R.st;if(R.st){var bm=R.st.k>=R.st.n;sch.textContent=bm?'BOSS':'STAGE '+R.st.k+'/'+R.st.n;sch.classList.toggle('boss',bm)}
   var gt=cfg.goalType,frac=0,gtxt='',free=isFree();
   var hv=free?[R.kills,R.bonus,R.exp,'Lv.'+curLv()]:[(R.dist/1000).toFixed(2),fmtTime(R.active),R.kills,R.huntDist>50?fmtPace(R.hunt/R.huntDist):"--'--\""];
   var hl=free?['처치','보너스','EXP','레벨']:['KM','시간','처치','페이스'];
   for(var hi=0;hi<4;hi++){var hcell=document.querySelector('.hud').children[hi];hcell.children[0].textContent=hv[hi];hcell.children[1].textContent=hl[hi]}
   if(R.mp&&!free){var mrem=Math.max(0,R.mp.endAt-serverNow());hv[1]=fmtTime(mrem);hl[1]='남은 시간';for(hi=0;hi<4;hi++){var hc2=document.querySelector('.hud').children[hi];hc2.children[0].textContent=hv[hi];hc2.children[1].textContent=hl[hi]}}
   if(free){gtxt='자유 모드 · 종료 버튼으로 마쳐요'}
+  else if(R.st){
+    var ss=R.st,stt=(ss.n-1)*ss.per;
+    if(ss.k>=ss.n){frac=(stt+(ss.done||0))/(stt+3);gtxt='보스전 · 약점 '+(ss.done||0)+'/'+(ss.parts?ss.parts.length:3)}
+    else{frac=((ss.k-1)*ss.per+ss.cnt)/(stt+3);gtxt='STAGE '+ss.k+'/'+ss.n+' · '+ss.cnt+'/'+ss.per+' 처치 · 목표 '+fmtPace(stagePace(ss,ss.k))+'/km'}
+    if(R.mp)gtxt+=' · '+fmtTime(Math.max(0,R.mp.endAt-serverNow()));
+  }
   else if(R.mp){frac=1-Math.max(0,R.mp.endAt-serverNow())/(R.mp.dur*60000);gtxt='대결 · 남은 시간 '+fmtTime(Math.max(0,R.mp.endAt-serverNow()))}
   else if(destOn()){
     if(R.fin&&R.pos){
@@ -1692,7 +1973,7 @@ function render(){
   var canRe=R.phase==='hunting'&&R.monster&&!R.monster.boss;$('#btn-reroll').disabled=!canRe;$('#btn-reroll').style.opacity=canRe?1:.4;
   if(R.phase==='hunting'&&R.monster&&R.pos){
     var m=R.monster,dn=hav(R.pos,m),b=bearing(R.pos,m),k=Math.round(b/45)%8;
-    $('#m-name').textContent=(m.boss?'도착지 보스 · ':'')+MON[m.idx].name;
+    $('#m-name').textContent=(m.part&&R.st?'보스 약점 '+((R.st.done||0)+1)+'/'+(R.st.parts?R.st.parts.length:3)+' · ':m.boss?'도착지 보스 · ':'')+MON[m.idx].name;
     var dtxt=DIRS[k]+'쪽',rot=b;
     if(R.heading!=null){var rel=angDiff(R.heading,b);dtxt=relText(rel)+' · '+dtxt;rot=rel}
     $('#m-dir').textContent=dtxt;$('#m-arrow').style.transform='rotate('+rot+'deg)';
@@ -1701,7 +1982,8 @@ function render(){
     var rem=m.target-m.elapsed,bo=$('#m-bonus');
     bo.textContent=rem>0?'보너스까지 '+fmtTime(rem):'보너스 시간 지남';bo.classList.toggle('on',rem>0);
     $('#m-elapsed').textContent='경과 '+fmtTime(m.elapsed)+' · 목표 '+fmtTime(m.target);
-    $('#lk-kakao').href='https://map.kakao.com/link/map/'+encodeURIComponent('몬스터')+','+m.lat.toFixed(6)+','+m.lng.toFixed(6);
+    var pl=$('#m-place');pl.hidden=!m.place;pl.textContent=m.place?(m.place+' 근처'):'';
+    $('#lk-kakao').href='https://map.kakao.com/link/map/'+encodeURIComponent(m.place||'몬스터')+','+m.lat.toFixed(6)+','+m.lng.toFixed(6);
     $('#lk-google').href='https://www.google.com/maps/search/?api=1&query='+m.lat.toFixed(6)+','+m.lng.toFixed(6);
   }
   if(R.phase==='resting'){
@@ -1731,11 +2013,12 @@ function draw(ts){
   var up=(cfg.hdUp&&R.hdDisp!=null)?R.hdDisp:0,cs=Math.cos(up*D2R),sn=Math.sin(up*D2R);
   function tf(o){return {x:o.x*cs-o.y*sn,y:o.x*sn+o.y*cs}}
   /* disc */
-  ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);var rg=ctx.createRadialGradient(cx,cy,rr*0.08,cx,cy,rr);rg.addColorStop(0,'#ffffff');rg.addColorStop(1,'#ebe6ff');ctx.fillStyle=rg;ctx.fill();
-  ctx.strokeStyle='#cfc6f2';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);var rg=ctx.createRadialGradient(cx,cy,rr*0.08,cx,cy,rr);var bossM=!!(R.st&&R.st.k>=R.st.n);rg.addColorStop(0,bossM?'#fffaf4':'#ffffff');rg.addColorStop(1,bossM?'#ffe0cc':'#ebe6ff');ctx.fillStyle=rg;ctx.fill();
+  ctx.strokeStyle=bossM?'#f0a77c':'#cfc6f2';ctx.lineWidth=3;ctx.stroke();
   ctx.save();ctx.beginPath();ctx.arc(cx,cy,rr-0.5,0,Math.PI*2);ctx.clip();
   /* range */
   var m=R.monster,dn=(m&&R.pos)?hav(R.pos,m):0;
+  if(R.st&&R.st.parts&&R.pos){R.st.parts.forEach(function(q){if(!q.done)dn=Math.max(dn,hav(R.pos,q))})}
   var want=Math.max(100,dn*1.3),target=RANGES[RANGES.length-1];
   for(var i=0;i<RANGES.length;i++){if(RANGES[i]>=want){target=RANGES[i];break}}
   if(!frozen)R.rangeDisp+=(target-R.rangeDisp)*(RM?1:0.06);
@@ -1749,6 +2032,11 @@ function draw(ts){
     ctx.fillStyle=C.mute;ctx.fillText(r>=1000?(r/1000)+'km':r+'m',cx+4,cy-r*scale-3);
   }
   ctx.beginPath();ctx.moveTo(cx-rr,cy);ctx.lineTo(cx+rr,cy);ctx.moveTo(cx,cy-rr);ctx.lineTo(cx,cy+rr);ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.stroke();
+  for(var ti=0;ti<36;ti++){
+    var th2=(ti*10-up)*D2R,major=ti%9===0,mid=ti%3===0,r1=rr-(major?14:mid?9:5);
+    ctx.beginPath();ctx.moveTo(cx+Math.sin(th2)*(rr-2),cy-Math.cos(th2)*(rr-2));ctx.lineTo(cx+Math.sin(th2)*r1,cy-Math.cos(th2)*r1);
+    ctx.strokeStyle=major?'#9a8fd6':'#cfc6f2';ctx.lineWidth=major?2:1;ctx.stroke();
+  }
   ctx.fillStyle=C.mute;ctx.textAlign='center';ctx.fillText('N',cx+Math.sin(-up*D2R)*(rr-13),cy-Math.cos(-up*D2R)*(rr-13)+4);
   /* sweep */
   if(!RM&&!frozen){
@@ -1795,6 +2083,17 @@ function draw(ts){
       var bob=(RM||frozen)?0:Math.sin(t/260)*2,sp=Math.max(3,Math.round(w/88));
       ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(X,Y+sp*6.6,sp*5.2,sp*1.3,0,0,Math.PI*2);ctx.fill();
       drawSprite(ctx,MON[m.idx],X,Y+bob,sp);
+    }
+    /* 보스 약점(나머지) */
+    if(R.st&&R.st.parts){
+      R.st.parts.forEach(function(q){
+        if(q.done||(m&&q.lat===m.lat&&q.lng===m.lng))return;
+        var po2=tf(offsetM(R.pos,q)),qx=po2.x*scale,qy=-po2.y*scale,ql=Math.hypot(qx,qy),qlim=rr-22;
+        if(ql>qlim){qx*=qlim/ql;qy*=qlim/ql}
+        var QX=cx+qx,QY=cy+qy,qs=Math.max(2,Math.round(w/110));
+        ctx.beginPath();ctx.arc(QX,QY,Math.max(9,KILL_R*scale),0,Math.PI*2);ctx.strokeStyle=C.gold;ctx.setLineDash([3,4]);ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+        drawSprite(ctx,MON[bossIdx()],QX,QY,qs);
+      });
     }
     /* 다른 참가자 */
     if(R.mp&&R.mp.players){
@@ -1849,14 +2148,14 @@ $('#btn-end').onclick=function(){
   if(b.dataset.arm==='1'){b.dataset.arm='0';clearTimeout(endT);b.innerHTML='종료';finish()}
   else{b.dataset.arm='1';b.innerHTML='한 번 더<br>누르면 종료';clearTimeout(endT);endT=setTimeout(function(){b.dataset.arm='0';b.innerHTML='종료'},3000)}
 };
-$('#again').onclick=function(){var wasMp=!!(R&&R.mp);R=null;cancelAnimationFrame(raf);if(wasMp){paintMode();show('#s-mode')}else{paintSetup();show('#s-setup')}};
+$('#again').onclick=function(){var wasMp=!!(R&&R.mp),wasSt=!!(R&&R.st);R=null;cancelAnimationFrame(raf);if(wasMp){paintMode();show('#s-mode')}else if(wasSt){paintStage();show('#s-stage')}else{paintSetup();show('#s-setup')}};
 window.addEventListener('keydown',function(e){if(e.key==='Escape'&&R&&!R.paused&&R.phase!=='done'&&!$('#s-run').hidden)setPause(true)});
 
 var dexFrom='#s-setup';
 function openDex(from){dexFrom=from;paintDex();show('#s-dex')}
 $('#dex-open').onclick=function(){openDex('#s-setup')};
 $('#d-dex').onclick=function(){openDex('#s-done')};
-$('#dex-back').onclick=function(){if(dexFrom==='#s-setup')paintSetup();show(dexFrom)};
+$('#dex-back').onclick=function(){if(dexFrom==='#s-setup')paintSetup();else if(dexFrom==='#s-mode')paintMode();show(dexFrom)};
 
 /* ---------- 멀티플레이 (서버 설정 없이: 공개 MQTT 중계 서버 사용) ---------- */
 var MPRUN=null;
@@ -1930,10 +2229,12 @@ function mpPaintHome(){
   $('#mp-c-note').textContent=MP.center==='set'&&hasSet?('중심: '+(cfg.area.c.label||'정해 둔 장소')):hasSet?'방을 만드는 지금 내 위치가 중심이 돼요.':'방을 만드는 지금 내 위치가 중심이 돼요. (설정 화면에서 러닝 영역 중심을 정해 두면 그곳을 고를 수 있어요)';
   $('#mp-r-val').textContent=MP.r>=1000?(MP.r/1000).toFixed(1)+' km':MP.r+' m';
   $('#mp-t-val').textContent=MP.dur+' 분';
+  var mn=$('#mp-mode-note');mn.hidden=!MP.stage;
+  if(MP.stage){var sc=cfg.stage;mn.textContent='스테이지 모드 · '+fmtPace(sc.base)+'/km 시작, 단계마다 '+sc.step+'초씩 빨라져요 · 보스 포함 '+sc.n+'단계. 보스까지 먼저 쓰러뜨린 사람이 1등이에요.'}
 }
 function mpReadInputs(){MP.name=($('#mp-name').value.trim()||MP.name).slice(0,10);store.set('rq_mp_name',MP.name)}
-function openMp(){
-  MP.started=false;clearInterval(MP.cdIv);
+function openMp(stage){
+  MP.stage=!!stage;MP.started=false;clearInterval(MP.cdIv);
   $('#mp-home').hidden=false;$('#mp-lobby').hidden=true;mpMsg('');mpPaintHome();show('#s-mp');
 }
 function mpErr(e){
@@ -1968,15 +2269,15 @@ function mpOnMsg(topic,str){
 }
 function mpPublish(s){
   if(!MP.mq||!MP.code)return;
-  var o={name:MP.name,eq:prof.eq,kills:s.kills||0,exp:s.exp||0,dist:Math.round(s.dist||0),lk:s.lk||null,t:Date.now()};
+  var o={name:MP.name,eq:prof.eq,kills:s.kills||0,exp:s.exp||0,dist:Math.round(s.dist||0),lk:s.lk||null,t:Date.now(),sg:s.sg||0,stg:s.stg||0};
   if(s.pos){o.lat=+s.pos.lat.toFixed(5);o.lng=+s.pos.lng.toFixed(5)}
   MP.mq.pub(mpTopic('p/'+MP.uid),JSON.stringify(o));
 }
-function mpSync(){var mp=R&&R.mp;if(!mp||R.phase==='done')return;mpPublish({kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos,lk:mp.lastKill})}
+function mpSync(){var mp=R&&R.mp;if(!mp||R.phase==='done')return;mpPublish({kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos,lk:mp.lastKill,sg:stSc(),stg:R.st?R.st.k:0})}
 function mpBeat(){
   if(!MP.mq||!MP.code)return;
   var s;
-  if(R&&R.mp&&R.phase!=='done')s={kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos,lk:R.mp.lastKill};
+  if(R&&R.mp&&R.phase!=='done')s={kills:R.kills,exp:R.exp,dist:R.dist,pos:R.pos,lk:R.mp.lastKill,sg:stSc(),stg:R.st?R.st.k:0};
   else if(MP.fin)s=MP.fin;else s={kills:0,exp:0,dist:0,pos:null,lk:null};
   mpPublish(s);
   if(MP.host&&MP.room){MP.room.t=Date.now();MP.mq.pub(mpTopic('room'),JSON.stringify(MP.room))}
@@ -1992,7 +2293,7 @@ function mpCreate(){
     MQConnect(brokerList(),function(err,cl){
       if(err){done();mpErr(err);return}
       MP.code=BCH.charAt(cl.idx)+mpGen4();MP.host=true;MP.off=0;MP.offs=[];MP.players={};MP.started=false;MP.fin=null;
-      MP.room={v:1,host:MP.uid,zone:{lat:+c.lat.toFixed(6),lng:+c.lng.toFixed(6),r:MP.r,label:c.label||''},dur:MP.dur,status:'lobby',t:Date.now()};
+      MP.room={v:1,host:MP.uid,zone:{lat:+c.lat.toFixed(6),lng:+c.lng.toFixed(6),r:MP.r,label:c.label||''},dur:MP.dur,status:'lobby',t:Date.now(),stage:MP.stage?{base:cfg.stage.base,step:cfg.stage.step,n:cfg.stage.n,per:cfg.stage.per}:null};
       mpAttach(cl);mpMsg('');done();enterLobby();
     });
   };
@@ -2031,7 +2332,7 @@ function enterLobby(){
 function paintLobby(){
   var r=MP.room;if(!r)return;
   var z=r.zone||{};
-  $('#lb-info').textContent='영역 반경 '+(z.r>=1000?(z.r/1000).toFixed(1)+' km':z.r+' m')+' · '+r.dur+'분 대결'+(z.label?' · '+z.label:'');
+  $('#lb-info').textContent='영역 반경 '+(z.r>=1000?(z.r/1000).toFixed(1)+' km':z.r+' m')+' · '+r.dur+'분 대결'+(r.stage?' · 스테이지 모드':'')+(z.label?' · '+z.label:'');
   $('#lb-map').href='https://www.google.com/maps/search/?api=1&query='+z.lat+','+z.lng;
   $('#lb-dist').textContent=MP.here?('영역 중심까지 약 '+fmtDist(hav(MP.here,z))+' 떨어져 있어요. 시작 전에 영역 안으로 모여 주세요.'):'';
   var ul=$('#lb-list');ul.innerHTML='';
@@ -2081,7 +2382,7 @@ function startMpRun(r){
   MP.bak=JSON.parse(JSON.stringify(cfg));MP.active=true;
   cfg.goalType='time';cfg.goalMin=r.dur;cfg.destMode='none';cfg.dest=null;
   cfg.area={on:true,r:r.zone.r,center:'custom',c:{lat:r.zone.lat,lng:r.zone.lng,label:r.zone.label||''}};
-  MPRUN={code:MP.code,uid:MP.uid,startAt:r.startAt,endAt:r.endAt,dur:r.dur,zone:r.zone,players:MP.players,lastKill:null};
+  MPRUN={stage:r.stage||null,code:MP.code,uid:MP.uid,startAt:r.startAt,endAt:r.endAt,dur:r.dur,zone:r.zone,players:MP.players,lastKill:null};
   startRun();
   if(!R){MPRUN=null;mpRestore();mpLeaveLocal('대결을 시작하지 못했어요. 위치 권한을 확인해 주세요.');openMp();return}
   mpPaintBoard();
@@ -2092,10 +2393,11 @@ function mpRestore(){
   MP.active=false;MP.bak=null;
 }
 function mpRank(mp,me){
-  var arr=Object.keys(mp.players||{}).map(function(id){var p=mp.players[id];return {id:id,name:p.name||'?',eq:p.eq,kills:p.kills||0,exp:p.exp||0,lk:p.lk||1e15}});
-  if(!arr.some(function(p){return p.id===mp.uid}))arr.push({id:mp.uid,name:MP.name,eq:prof.eq,kills:0,exp:0,lk:1e15});
-  arr.forEach(function(p){if(p.id===mp.uid&&me){p.kills=Math.max(p.kills,me.kills);p.exp=Math.max(p.exp,me.exp);if(mp.lastKill)p.lk=mp.lastKill}});
-  arr.sort(function(a,b){return b.kills-a.kills||b.exp-a.exp||a.lk-b.lk});
+  var arr=Object.keys(mp.players||{}).map(function(id){var p=mp.players[id];return {id:id,name:p.name||'?',eq:p.eq,kills:p.kills||0,exp:p.exp||0,lk:p.lk||1e15,sg:p.sg||0,stg:p.stg||0}});
+  if(!arr.some(function(p){return p.id===mp.uid}))arr.push({id:mp.uid,name:MP.name,eq:prof.eq,kills:0,exp:0,lk:1e15,sg:0,stg:0});
+  arr.forEach(function(p){if(p.id===mp.uid&&me){p.kills=Math.max(p.kills,me.kills);p.exp=Math.max(p.exp,me.exp);p.sg=Math.max(p.sg,me.sg||0);p.stg=Math.max(p.stg,me.stg||0);if(mp.lastKill)p.lk=mp.lastKill}});
+  if(mp.stage)arr.sort(function(a,b){return b.sg-a.sg||a.lk-b.lk});
+  else arr.sort(function(a,b){return b.kills-a.kills||b.exp-a.exp||a.lk-b.lk});
   return arr;
 }
 function fillRows(box,rank,me,max){
@@ -2108,21 +2410,21 @@ function fillRows(box,rank,me,max){
     var no=document.createElement('span');no.className='no';no.textContent=i+1;
     var c=document.createElement('canvas');c.width=68;c.height=68;var g=c.getContext('2d');g.setTransform(2,0,0,2,0,0);drawRunner(g,17,32,0.52,0,true,lookOf(p.eq));
     var nm=document.createElement('span');nm.className='nm';nm.textContent=p.name+(p.id===me?' (나)':'');
-    var kc=document.createElement('span');kc.className='kc num';kc.textContent=p.kills+'마리';
+    var kc=document.createElement('span');kc.className='kc num';kc.textContent=p.stg>0?(p.sg>=100?'보스 격파':'STAGE '+p.stg+' · '+p.kills+'마리'):p.kills+'마리';
     row.appendChild(no);row.appendChild(c);row.appendChild(nm);row.appendChild(kc);box.appendChild(row);
   });
 }
 function mpPaintBoard(){
   var b=$('#mp-board');if(!R||!R.mp){b.hidden=true;return}
   b.hidden=false;
-  var rank=mpRank(R.mp,{kills:R.kills,exp:R.exp});
+  var rank=mpRank(R.mp,{kills:R.kills,exp:R.exp,sg:stSc(),stg:R.st?R.st.k:0});
   fillRows($('#mp-rows'),rank,R.mp.uid,5);
   $('#mp-state').textContent=MP.mq?rank.length+'명 참가':'연결 끊김 · 다시 연결 중…';
 }
 function mpBoardSoon(){if(MP.pbT)return;MP.pbT=setTimeout(function(){MP.pbT=0;if(R&&R.mp)mpPaintBoard()},400)}
 function mpFinish(mp,me){
   me.lk=mp.lastKill;MP.fin=me;
-  var over=serverNow()>=mp.endAt-2000,sub=$('#d-rank-sub'),box=$('#d-rank-rows');
+  var over=serverNow()>=mp.endAt-2000||(me.sg||0)>=100,sub=$('#d-rank-sub'),box=$('#d-rank-rows');
   sub.textContent=over?'최종 순위를 집계하는 중…':'중간에 종료했어요';
   fillRows(box,mpRank(mp,me),mp.uid,8);mpPublish(me);
   var iv=setInterval(function(){fillRows(box,mpRank(mp,me),mp.uid,8)},1000);
@@ -2138,11 +2440,65 @@ function mpFinish(mp,me){
   },over?5500:300);
   setTimeout(function(){if(MP.fin===me)mpDisconnect()},over?9000:3000);
 }
-$('#m-duo').onclick=openMp;
-$('#m-solo').onclick=function(){paintSetup();show('#s-setup')};
-$('#setup-back').onclick=function(){paintMode();show('#s-mode')};
-function paintMode(){$('#m-hi').textContent='Lv.'+curLv()+' '+titleOf(curLv())+' · '+prof.gold+' G'}
-$('#mp-back').onclick=function(){if(MP.code&&!$('#mp-lobby').hidden){mpLeave()}paintMode();show('#s-mode')};
+function paintKind(){
+  $('#k-hi').textContent=(PLAY.who==='solo'?'혼자하기':'같이하기')+' · 어떤 모드로 달릴까요?';
+  var r=$('#k-rec');r.hidden=!(prof.sclear||prof.sbest);
+  if(!r.hidden)r.textContent='클리어 '+(prof.sclear||0)+'회 · 최고 STAGE '+(prof.sbest||0);
+}
+function paintStage(){
+  var c=cfg.stage;
+  $('#st-base-v').textContent=fmtPace(c.base);$('#st-base-s').textContent='/km · '+(3600/c.base).toFixed(1)+' km/h';
+  $('#st-step-v').textContent=c.step+'초';$('#st-n-v').textContent=c.n+'단계';$('#st-per-v').textContent=c.per+'마리';
+  var h='';for(var k=1;k<=c.n;k++)h+='<span class="'+(k===c.n?'boss':'')+'">'+(k===c.n?'BOSS':'STAGE '+k)+'<b>'+fmtPace(stagePace(c,k))+'</b></span>';
+  $('#st-prev').innerHTML=h;
+  var last=stagePace(c,c.n);
+  $('#st-note').textContent='마지막 단계는 시작 페이스보다 '+(c.base-last)+'초 빨라요. 보스까지 몬스터 '+((c.n-1)*c.per)+'마리를 잡고, 보스의 약점 3곳을 모두 찾아가면 클리어예요.';
+  $('#st-area').hidden=!(cfg.area&&cfg.area.on);
+  $('#st-start').textContent=PLAY.who==='solo'?'원정 시작':'다음 · 방 만들기';
+  $('#st-poi-on').setAttribute('aria-pressed',String(poiOn()));$('#st-poi-off').setAttribute('aria-pressed',String(!poiOn()));
+  $('#st-msg').hidden=true;
+}
+function startStage(){
+  if(PLAY.who==='solo'){STRUN={base:cfg.stage.base,step:cfg.stage.step,n:cfg.stage.n,per:cfg.stage.per};startRun();if(!R)STRUN=null}
+  else openMp(true);
+}
+$('#m-solo').onclick=function(){PLAY.who='solo';paintKind();show('#s-kind')};
+$('#m-duo').onclick=function(){PLAY.who='duo';paintKind();show('#s-kind')};
+$('#kind-back').onclick=function(){paintMode();show('#s-mode')};
+$('#k-norm').onclick=function(){if(PLAY.who==='solo'){paintSetup();show('#s-setup')}else openMp(false)};
+$('#k-stg').onclick=function(){paintStage();show('#s-stage')};
+$('#stage-back').onclick=function(){paintKind();show('#s-kind')};
+$('#st-start').onclick=startStage;
+$('#poi-on').onclick=$('#st-poi-on').onclick=function(){cfg.poi=true;stSave();paintSetup();paintStage()};
+$('#poi-off').onclick=$('#st-poi-off').onclick=function(){cfg.poi=false;stSave();paintSetup();paintStage()};
+function stSave(){store.set('rq_cfg',cfg)}
+hold($('#st-base-dn'),function(){cfg.stage.base=clamp(cfg.stage.base-5,180,720);stSave();paintStage()});
+hold($('#st-base-up'),function(){cfg.stage.base=clamp(cfg.stage.base+5,180,720);stSave();paintStage()});
+hold($('#st-step-dn'),function(){cfg.stage.step=clamp(cfg.stage.step-5,5,40);stSave();paintStage()});
+hold($('#st-step-up'),function(){cfg.stage.step=clamp(cfg.stage.step+5,5,40);stSave();paintStage()});
+hold($('#st-n-dn'),function(){cfg.stage.n=clamp(cfg.stage.n-1,3,8);stSave();paintStage()});
+hold($('#st-n-up'),function(){cfg.stage.n=clamp(cfg.stage.n+1,3,8);stSave();paintStage()});
+hold($('#st-per-dn'),function(){cfg.stage.per=clamp(cfg.stage.per-1,1,6);stSave();paintStage()});
+hold($('#st-per-up'),function(){cfg.stage.per=clamp(cfg.stage.per+1,1,6);stSave();paintStage()});
+$('#setup-back').onclick=function(){paintKind();show('#s-kind')};
+function paintMode(){
+  paintLevel($('#m-p-lv'),$('#m-p-meta'),$('#m-p-prog'));
+  $('#m-p-gold').textContent=prof.gold+' G';
+  var oc=ITEMS.filter(function(x){return owned(x.id)}).length;$('#m-shop-s').textContent='보유 '+oc+'/'+ITEMS.length+'개 · '+prof.gold+' G';
+  paintAvatar();
+  $('#m-dex-s').textContent=dexSummary()+nextUnlockText();
+  paintThumbs('#m-dex-thumbs');
+}
+$('#m-shop-open').onclick=function(){openShop('#s-mode')};
+$('#m-dex-open').onclick=function(){openDex('#s-mode')};
+$('#mp-back').onclick=function(){if(MP.code&&!$('#mp-lobby').hidden){mpLeave()}paintKind();show('#s-kind')};
+$('#lb-copy').onclick=function(){
+  var b=this,txt='런 퀘스트 같이하기! 방 코드: '+(MP.code||'')+(/^https?:/.test(location.href)?'\n'+location.href.split('#')[0]:'');
+  function ok(m){b.textContent=m;setTimeout(function(){b.textContent='코드 복사 · 공유하기'},1800)}
+  if(navigator.share){navigator.share({title:'런 퀘스트',text:txt}).then(function(){ok('공유했어요')}).catch(function(){})}
+  else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){ok('복사했어요!')}).catch(function(){ok('길게 눌러 복사해 주세요')})}
+  else ok('길게 눌러 복사해 주세요');
+};
 $('#mp-create').onclick=mpCreate;$('#mp-join').onclick=mpJoin;$('#lb-start').onclick=mpStart;$('#lb-leave').onclick=mpLeave;
 $('#mp-c-here').onclick=function(){MP.center='here';mpPaintHome()};
 $('#mp-c-set').onclick=function(){if(cfg.area&&cfg.area.c){MP.center='set';mpPaintHome()}};
@@ -2223,7 +2579,7 @@ function startShopAnim(){
 function stopShopAnim(){if(shopRaf){cancelAnimationFrame(shopRaf);shopRaf=null}}
 $('#shop-open').onclick=function(){openShop('#s-setup')};
 $('#d-shop').onclick=function(){openShop('#s-done')};
-$('#shop-back').onclick=function(){if(shopFrom==='#s-setup')paintSetup();show(shopFrom)};
+$('#shop-back').onclick=function(){if(shopFrom==='#s-setup')paintSetup();else if(shopFrom==='#s-mode')paintMode();show(shopFrom)};
 
 paintMode();
 initSetup();
