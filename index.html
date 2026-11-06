@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style></head><body><title>런 퀘스트</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style></head><body><title>런 헌트</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,7 +445,7 @@ main>section:not([hidden]){animation:rise .35s ease-out both}
     <div class="hero" id="hero-wrap">
       <canvas id="hero-cv" aria-hidden="true"></canvas>
       <div class="ttl">
-        <h1>런 퀘스트</h1>
+        <h1>런 헌트</h1>
         <p class="lede">달린 만큼 몬스터를 만나요</p>
       </div>
     </div>
@@ -1831,7 +1831,7 @@ function nativeBG(){
 }
 function startNativeGps(BG){
   var got=false,mine=R;
-  BG.addWatcher({backgroundTitle:'런 퀘스트',backgroundMessage:'달리는 중이에요. 몬스터를 쫓고 있어요',requestPermissions:true,stale:false,distanceFilter:0},function(loc,err){
+  BG.addWatcher({backgroundTitle:'런 헌트',backgroundMessage:'달리는 중이에요. 몬스터를 쫓고 있어요',requestPermissions:true,stale:false,distanceFilter:0},function(loc,err){
     if(R!==mine||!R||R.phase==='done')return;
     if(err){
       if(!got){
@@ -2759,9 +2759,9 @@ $('#m-shop-open').onclick=function(){openShop('#s-mode')};
 $('#m-dex-open').onclick=function(){openDex('#s-mode')};
 $('#mp-back').onclick=function(){if(MP.code&&!$('#mp-lobby').hidden){mpLeave()}paintKind();show('#s-kind')};
 $('#lb-copy').onclick=function(){
-  var b=this,txt='런 퀘스트 같이하기! 방 코드: '+(MP.code||'')+(/^https?:/.test(location.href)?'\n'+location.href.split('#')[0]:'');
+  var b=this,txt='런 헌트 같이하기! 방 코드: '+(MP.code||'')+(/^https?:/.test(location.href)?'\n'+location.href.split('#')[0]:'');
   function ok(m){b.textContent=m;setTimeout(function(){b.textContent='코드 복사 · 공유하기'},1800)}
-  if(navigator.share){navigator.share({title:'런 퀘스트',text:txt}).then(function(){ok('공유했어요')}).catch(function(){})}
+  if(navigator.share){navigator.share({title:'런 헌트',text:txt}).then(function(){ok('공유했어요')}).catch(function(){})}
   else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){ok('복사했어요!')}).catch(function(){ok('길게 눌러 복사해 주세요')})}
   else ok('길게 눌러 복사해 주세요');
 };
